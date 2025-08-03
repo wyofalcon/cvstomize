@@ -1,8 +1,8 @@
 import { GoogleGenerativeAI } from '@google/generative-ai';
 import formidable from 'formidable';
 import fs from 'fs';
-import { Document } from 'docx';
-import * as pdfjs from 'pdfjs-dist/legacy/build/pdf.js'; // Using the 'legacy' build as requested by the warning
+import mammoth from 'mammoth';
+import * as pdfjsLib from 'pdfjs-dist/legacy/build/pdf.js';
 
 export const config = {
   api: {
@@ -12,7 +12,7 @@ export const config = {
 
 const parseFormData = async (req) => {
   return new Promise((resolve, reject) => {
-    const form = formidable({}); // This will now work correctly with the 'import' syntax
+    const form = formidable({ keepExtensions: true }); // This will now work correctly with the 'import' syntax
     form.parse(req, (err, fields, files) => {
       if (err) {
         reject(err);
@@ -34,33 +34,34 @@ const parseFormData = async (req) => {
 const extractTextFromFile = async (filePath) => {
     const extension = filePath.split('.').pop().toLowerCase();
     try {
-      const dataBuffer = fs.readFileSync(filePath);
-
-      if (extension === 'pdf') {
-        const data = new Uint8Array(dataBuffer);
-        // The legacy build of pdfjs does not require a worker to be set manually in Node.js
-        const doc = await pdfjs.getDocument(data).promise;
-        let text = '';
-        for (let i = 1; i <= doc.numPages; i++) {
-            const page = await doc.getPage(i);
-            const content = await page.getTextContent();
-            const strings = content.items.map(item => item.str);
-            text += strings.join(' ') + '\n';
+        if (!fs.existsSync(filePath)) {
+            throw new Error(`File does not exist: ${filePath}`);
         }
-        return text;
-      } else if (extension === 'docx') {
-        const doc = await Document.load(dataBuffer);
-        let text = '';
-        doc.getParagraphs().forEach(p => {
-            text += p.getText() + '\n';
-        });
-        return text;
-      } else {
-        return dataBuffer.toString('utf-8');
-      }
+        const dataBuffer = fs.readFileSync(filePath);
+
+        if (extension === 'pdf') {
+            console.log('Extracting PDF:', filePath);
+            const data = new Uint8Array(dataBuffer);
+            const doc = await pdfjsLib.getDocument({ data }).promise;
+            let text = '';
+            for (let i = 1; i <= doc.numPages; i++) {
+                const page = await doc.getPage(i);
+                const content = await page.getTextContent();
+                const strings = content.items.map(item => item.str);
+                text += strings.join(' ') + '\n';
+            }
+            return text;
+        } else if (extension === 'docx') {
+            console.log('Extracting DOCX:', filePath);
+            const result = await mammoth.extractRawText({ buffer: dataBuffer });
+            return result.value;
+        } else {
+            console.log('Extracting as plain text:', filePath);
+            return dataBuffer.toString('utf-8');
+        }
     } catch (error) {
-      console.error(`Error extracting text from ${filePath}:`, error);
-      return '';
+        console.error(`Error extracting text from ${filePath}:`, error);
+        return '';
     }
 };
 
@@ -83,13 +84,18 @@ export default async function handler(req, res) {
     let originalCvText = '';
     for (const file of documents) {
       const text = await extractTextFromFile(file.filepath);
+     // Inside the loop
+                console.log('Extracted text:', text);
       originalCvText += text + '\n\n---\n\n';
-      fs.unlinkSync(file.filepath);
+      if (fs.existsSync(file.filepath)) {
+        fs.unlinkSync(file.filepath);
+      }
     }
+    console.log('Extracted CV text:', originalCvText); // <-- Add this line
 
     const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
     const model = genAI.getGenerativeModel({ model: 'gemini-1.5-flash' });
-    
+
     const prompt = `
       You are an elite-level professional resume writer and career strategist. Your task is to act as a personal hiring consultant for the user.
       **PRIMARY DIRECTIVE:**
@@ -106,6 +112,7 @@ export default async function handler(req, res) {
       4.  **Strict Formatting:** The output MUST be clean, structured Markdown. This is not optional. Use '#' for the name, '##' for section headers (e.g., "## Professional Experience"), and '*' for bullet points. Do not add any other formatting.
       5.  **Strict Section Adherence:** You MUST only generate the sections listed in \`<SECTIONS_TO_INCLUDE>\`. Do not add, remove, or rename sections.
       6.  **No Commentary:** Do not include any explanations, introductions, or concluding remarks in your output. The response must begin directly with the candidate's name.
+      7.  **Reference uploaded documents:** Your "Cherry-picked excellence" must be based on the provided documents. Do not reference any external sources or knowledge.
       ---
       **BEGIN INPUTS**
       ---
