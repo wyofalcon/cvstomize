@@ -71,36 +71,53 @@ function App() {
     if (!generatedCv) return;
 
     const resumeElement = document.getElementById('resume-content');
+    const padding = 20;
 
     html2canvas(resumeElement, {
-      scale: 2, // Higher scale for better quality
-      useCORS: true, // If you have images from other domains
-      logging: true, 
+      scale: 2,
+      useCORS: true,
+      logging: true,
+      x: padding,
+      y: padding,
+      width: resumeElement.offsetWidth - padding * 2,
+      height: resumeElement.offsetHeight - padding,
     }).then(canvas => {
       const imgData = canvas.toDataURL('image/png');
       const pdf = new jsPDF({
         orientation: 'p',
         unit: 'pt',
-        format: 'a4'
+        format: 'a4',
       });
 
-      const pdfWidth = pdf.internal.pageSize.getWidth();
-      const pdfHeight = pdf.internal.pageSize.getHeight();
+      const pdfWidth = pdf.internal.pageSize.getWidth() - padding * 2;
+      const pdfHeight = pdf.internal.pageSize.getHeight() - padding * 2;
       const canvasWidth = canvas.width;
       const canvasHeight = canvas.height;
       const ratio = canvasWidth / canvasHeight;
       const width = pdfWidth;
-      const height = width / ratio;
+      let height = width / ratio;
 
-      // If the height is greater than the PDF page height, you might need to split it
-      // For simplicity, this example scales it to fit. 
-      let finalHeight = height;
+      pdf.rect(padding, padding, pdfWidth, pdfHeight);
+
+      let position = padding;
+
       if (height > pdfHeight) {
-        console.warn("Content is taller than the page, scaling to fit.");
-        finalHeight = pdfHeight;
+        let page = 1;
+        while (height > 0) {
+          const pageHeight = Math.min(height, pdfHeight);
+          pdf.addImage(imgData, 'PNG', padding, position, width, pageHeight, undefined, 'FAST');
+          height -= pageHeight;
+          if (height > 0) {
+            pdf.addPage();
+            pdf.rect(padding, padding, pdfWidth, pdfHeight);
+            position = padding - pdfHeight * (page - 1);
+          }
+          page++;
+        }
+      } else {
+        pdf.addImage(imgData, 'PNG', padding, padding, width, height);
       }
 
-      pdf.addImage(imgData, 'PNG', 0, 0, pdfWidth, finalHeight);
       pdf.save('CVstomize_Resume.pdf');
     }).catch(err => {
       console.error("Error creating PDF: ", err);
