@@ -71,6 +71,11 @@ function App() {
     if (!generatedCv) return;
 
     const resumeElement = document.getElementById('resume-content');
+    if (!resumeElement) return;
+
+    // Temporarily add a class to the body for print-friendly styles
+    document.body.classList.add('print-friendly');
+
     const padding = 20;
 
     html2canvas(resumeElement, {
@@ -119,9 +124,11 @@ function App() {
       }
 
       pdf.save('CVstomize_Resume.pdf');
+      document.body.classList.remove('print-friendly'); // Clean up the class
     }).catch(err => {
       console.error("Error creating PDF: ", err);
       setError("Could not generate PDF. Please try a different style or contact support.");
+      document.body.classList.remove('print-friendly'); // Also clean up on error
     });
   };
 

@@ -96,3 +96,42 @@ textarea::placeholder { color: #888; }
 .resume-style-technical #resume-content ul { list-style-type: '» '; }
 
 @media (max-width: 900px) { .App-main { grid-template-columns: 1fr; } }
+
+/* --- Print-Friendly Styles for PDF Export --- */
+.print-friendly {
+  background-color: #ffffff !important;
+  color: #000000 !important;
+}
+
+.print-friendly .card,
+.print-friendly .App-header,
+.print-friendly .App-footer,
+.print-friendly .resume-output,
+.print-friendly .resume-style-technical #resume-content h1 {
+  background: #ffffff !important;
+  color: #000000 !important;
+  border-color: #000000 !important;
+  box-shadow: none !important;
+}
+
+.print-friendly #resume-content * {
+  color: #000000 !important;
+  background-color: transparent !important;
+}
+
+.print-friendly .resume-style-modern #resume-content h1,
+.print-friendly .resume-style-modern #resume-content h2 {
+  color: #000000 !important;
+  border-bottom-color: #000000 !important;
+}
+
+.print-friendly .resume-style-classic #resume-content h1,
+.print-friendly .resume-style-classic #resume-content h2 {
+  color: #000000 !important;
+  border-bottom-color: #000000 !important;
+}
+
+.print-friendly .resume-style-technical #resume-content h2 {
+    color: #000000 !important;
+}
+
