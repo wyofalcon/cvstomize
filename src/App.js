@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import axios from 'axios';
 import jsPDF from 'jspdf';
+import html2canvas from 'html2canvas';
 import FileUpload from './components/FileUpload';
 import TextInput from './components/TextInput';
 import ResumeDisplay from './components/ResumeDisplay';
@@ -68,21 +69,42 @@ function App() {
 
   const handleDownload = () => {
     if (!generatedCv) return;
-    
-    const doc = new jsPDF({
-      orientation: 'p',
-      unit: 'pt',
-      format: 'a4'
-    });
-    
-    doc.html(document.getElementById('resume-content'), {
-      callback: function(pdf) {
-        pdf.save('CVstomize_Resume.pdf');
-      },
-      x: 15,
-      y: 15,
-      width: 565,
-      windowWidth: 650
+
+    const resumeElement = document.getElementById('resume-content');
+
+    html2canvas(resumeElement, {
+      scale: 2, // Higher scale for better quality
+      useCORS: true, // If you have images from other domains
+      logging: true, 
+    }).then(canvas => {
+      const imgData = canvas.toDataURL('image/png');
+      const pdf = new jsPDF({
+        orientation: 'p',
+        unit: 'pt',
+        format: 'a4'
+      });
+
+      const pdfWidth = pdf.internal.pageSize.getWidth();
+      const pdfHeight = pdf.internal.pageSize.getHeight();
+      const canvasWidth = canvas.width;
+      const canvasHeight = canvas.height;
+      const ratio = canvasWidth / canvasHeight;
+      const width = pdfWidth;
+      const height = width / ratio;
+
+      // If the height is greater than the PDF page height, you might need to split it
+      // For simplicity, this example scales it to fit. 
+      let finalHeight = height;
+      if (height > pdfHeight) {
+        console.warn("Content is taller than the page, scaling to fit.");
+        finalHeight = pdfHeight;
+      }
+
+      pdf.addImage(imgData, 'PNG', 0, 0, pdfWidth, finalHeight);
+      pdf.save('CVstomize_Resume.pdf');
+    }).catch(err => {
+      console.error("Error creating PDF: ", err);
+      setError("Could not generate PDF. Please try a different style or contact support.");
     });
   };
 
