@@ -41,7 +41,43 @@ textarea::placeholder { color: #888; }
 .file-list ul { list-style: none; padding: 0; }
 .file-list li { background: #2a2a2a; padding: 0.5rem; border-radius: 4px; margin-bottom: 0.5rem; display: flex; justify-content: space-between; align-items: center; border: 1px solid var(--border-color); }
 .file-list button { background: #c94040; color: white; border: none; border-radius: 50%; width: 20px; height: 20px; cursor: pointer; line-height: 20px; text-align: center; }
-.resume-output { flex-grow: 1; background-color: #252525; border: 1px solid var(--border-color); border-radius: var(--border-radius); padding: 1.5rem; overflow-y: auto; min-height: 400px; transition: all 0.3s ease; }
+.resume-output {
+  flex-grow: 1;
+  background-color: #252525;
+  border: 1px solid var(--border-color);
+  border-radius: var(--border-radius);
+  padding: 1.5rem;
+  overflow: hidden; /* Changed from auto to hidden */
+  min-height: 400px;
+  transition: all 0.3s ease;
+  position: relative; /* Added for page controls */
+}
+
+.page-controls {
+  position: absolute;
+  bottom: 10px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: rgba(0, 0, 0, 0.5);
+  padding: 5px 10px;
+  border-radius: 5px;
+  display: flex;
+  gap: 10px;
+  align-items: center;
+}
+
+.page-controls button {
+  background: var(--primary-color);
+  color: white;
+  border: none;
+  padding: 5px 10px;
+  border-radius: 3px;
+  cursor: pointer;
+}
+
+.page-controls span {
+  color: white;
+}
 .placeholder-text { color: #888; display: flex; align-items: center; justify-content: center; height: 100%; }
 .App-footer { padding: 1rem 2rem; background: var(--card-background); text-align: center; box-shadow: 0 -4px 6px rgba(0, 0, 0, 0.1); border-top: 1px solid var(--border-color); }
 .generate-btn, .download-btn { background: var(--primary-color); color: var(--light-text-color); border: none; padding: 0.8rem 1.5rem; font-size: 1.1rem; border-radius: var(--border-radius); cursor: pointer; transition: background-color 0.2s; margin: 0 0.5rem; }
@@ -73,65 +109,247 @@ textarea::placeholder { color: #888; }
 .style-btn.active { background-color: var(--primary-color); color: var(--light-text-color); border-color: var(--primary-color); font-weight: bold; }
 
 /* --- NEW STYLES FOR RESUME THEMES --- */
+.resume-output #resume-content {
+    background: #fff;
+    color: #000;
+    font-family: 'Georgia', serif;
+    aspect-ratio: 210 / 297; /* A4 aspect ratio */
+    width: 100%;
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 2rem;
+    box-shadow: 0 0 10px rgba(0,0,0,0.1);
+    box-sizing: border-box;
+}
+
 .resume-output #resume-content * { transition: all 0.3s ease; }
-.resume-output #resume-content h1 { font-size: 2em; margin-bottom: 0.2em; }
+.resume-output #resume-content h1 { 
+  font-size: 2.5em; 
+  margin-bottom: 0.3em; 
+  font-weight: bold;
+  text-align: center;
+}
 .resume-output #resume-content h2 { font-size: 1.4em; margin-top: 1em; padding-bottom: 0.2em; }
 .resume-output #resume-content ul { padding-left: 20px; margin-top: 0.5em; }
 .resume-output #resume-content li { margin-bottom: 0.5em; }
 
+/* Style contact info that comes right after the name */
+.resume-output #resume-content h1 + p,
+.resume-output #resume-content h1 + ul {
+  text-align: center;
+  margin-bottom: 1.5em;
+  font-size: 0.9em;
+  line-height: 1.4;
+}
+
+/* Hide page controls (pagination buttons) */
+.page-controls {
+  display: none !important;
+}
+
 /* Modern Style */
 .resume-style-modern { font-family: 'Segoe UI', sans-serif; }
-.resume-style-modern #resume-content h1 { color: var(--secondary-color); text-align: center; }
-.resume-style-modern #resume-content h2 { color: var(--primary-color); border-bottom: 2px solid var(--primary-color); }
+.resume-style-modern h1 { color: #2c3e50; text-align: center; }
+.resume-style-modern h2 { color: #3498db; border-bottom: 2px solid #3498db; }
 
 /* Classic Style */
 .resume-style-classic { font-family: 'Georgia', serif; }
-.resume-style-classic #resume-content h1 { font-weight: bold; text-align: left; }
-.resume-style-classic #resume-content h2 { font-style: italic; border-bottom: 1px solid var(--border-color); }
+.resume-style-classic h1 { font-weight: bold; text-align: left; }
+.resume-style-classic h2 { font-style: italic; border-bottom: 1px solid #ccc; }
 
 /* Technical Style */
 .resume-style-technical { font-family: 'Consolas', 'Menlo', monospace; }
-.resume-style-technical #resume-content h1 { background-color: var(--border-color); color: var(--light-text-color); padding: 0.5rem; }
-.resume-style-technical #resume-content h2 { color: var(--text-color); border: none; }
-.resume-style-technical #resume-content ul { list-style-type: '» '; }
+.resume-style-technical h1 { background-color: #333; color: #fff; padding: 0.5rem; }
+.resume-style-technical h2 { color: #555; border: none; }
+.resume-style-technical ul { list-style-type: '» '; }
 
 @media (max-width: 900px) { .App-main { grid-template-columns: 1fr; } }
 
 /* --- Print-Friendly Styles for PDF Export --- */
-.print-friendly {
-  background-color: #ffffff !important;
-  color: #000000 !important;
+@media print {
+  @page {
+    size: A4;
+    margin: 0.75in 0.75in 0.75in 0.75in; /* Top, Right, Bottom, Left margins */
+  }
+
+  body, html {
+    margin: 0;
+    padding: 0;
+    background: #fff !important;
+    font-size: 12pt;
+    line-height: 1.4;
+  }
+
+  .App-header, .App-footer, .input-column, .download-btn, .tutorial-btn, .page-controls {
+    display: none !important;
+  }
+
+  /* Hide the section and style selector components completely */
+  .output-column > *:not(.card:first-child) {
+    display: none !important;
+  }
+
+  /* Hide card titles but NOT resume content headers */
+  .card > h2 {
+    display: none !important;
+  }
+
+  /* Ensure resume content headers are visible */
+  #resume-content h1,
+  #resume-content h2,
+  #resume-content h3 {
+    display: block !important;
+  }
+
+  .App, .App-main, .output-column, .card, .resume-output {
+    all: unset !important;
+    display: block !important;
+  }
+
+  #resume-content {
+    margin: 0;
+    padding: 0;
+    width: 100%;
+    max-width: none;
+    height: auto;
+    box-sizing: border-box;
+    box-shadow: none;
+    border: none;
+    aspect-ratio: unset;
+    transform: none !important; /* Remove any transforms for print */
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+    font-size: 12pt;
+    line-height: 1.4;
+  }
+
+  /* Ensure proper page breaks */
+  #resume-content h1 {
+    page-break-after: avoid;
+    break-after: avoid;
+    margin-top: 0;
+  }
+
+  /* Section breaks - group h2 with following content */
+  #resume-content h2 {
+    page-break-after: avoid;
+    break-after: avoid;
+    page-break-before: auto;
+    break-before: auto;
+    margin-top: 20pt;
+    margin-bottom: 8pt;
+  }
+
+  /* Keep section content together */
+  #resume-content h2 + * {
+    page-break-before: avoid;
+    break-before: avoid;
+  }
+
+  #resume-content h2 + * + * {
+    page-break-before: avoid;
+    break-before: avoid;
+  }
+
+  #resume-content h3 {
+    page-break-after: avoid;
+    break-after: avoid;
+    margin-top: 12pt;
+    margin-bottom: 6pt;
+  }
+
+  #resume-content p {
+    margin-bottom: 8pt;
+  }
+
+  #resume-content ul, #resume-content ol {
+    margin-bottom: 12pt;
+  }
+
+  #resume-content li {
+    margin-bottom: 4pt;
+  }
+
+  /* Prevent widows and orphans */
+  #resume-content * {
+    orphans: 3;
+    widows: 3;
+  }
+
+  /* Keep job entries together */
+  #resume-content h3 + ul,
+  #resume-content h3 + p {
+    page-break-before: avoid;
+    break-before: avoid;
+  }
+
+  /* Keep bullet point lists together when possible */
+  #resume-content ul {
+    page-break-inside: avoid;
+    break-inside: avoid;
+  }
+
+  /* Allow list items to break if list is too long */
+  #resume-content li {
+    page-break-inside: auto;
+    break-inside: auto;
+  }
+
+  /* Force page break when needed */
+  .page-break {
+    page-break-before: always;
+    break-before: page;
+  }
+
+  /* Avoid breaking important content */
+  .keep-together {
+    page-break-inside: avoid;
+    break-inside: avoid;
+  }
+
+  /* Adjust font sizes for print */
+  #resume-content h1 {
+    font-size: 24pt;
+    font-weight: bold;
+    text-align: center;
+    margin-bottom: 8pt;
+    margin-top: 0;
+  }
+
+  #resume-content h2 {
+    font-size: 14pt;
+    font-weight: bold;
+  }
+
+  #resume-content h3 {
+    font-size: 12pt;
+    font-weight: bold;
+  }
+
+  #resume-content {
+    font-size: 11pt;
+  }
+
+  /* Style contact info that comes right after the name */
+  #resume-content h1 + p,
+  #resume-content h1 + ul {
+    text-align: center;
+    margin-bottom: 16pt;
+    font-size: 10pt;
+    line-height: 1.3;
+  }
+
+  /* Ensure links are visible in print */
+  #resume-content a {
+    color: #000 !important;
+    text-decoration: underline;
+  }
+
+  /* Remove any unnecessary spacing */
+  #resume-content * {
+    max-width: 100%;
+  }
 }
 
-.print-friendly .card,
-.print-friendly .App-header,
-.print-friendly .App-footer,
-.print-friendly .resume-output,
-.print-friendly .resume-style-technical #resume-content h1 {
-  background: #ffffff !important;
-  color: #000000 !important;
-  border-color: #000000 !important;
-  box-shadow: none !important;
-}
 
-.print-friendly #resume-content * {
-  color: #000000 !important;
-  background-color: transparent !important;
-}
-
-.print-friendly .resume-style-modern #resume-content h1,
-.print-friendly .resume-style-modern #resume-content h2 {
-  color: #000000 !important;
-  border-bottom-color: #000000 !important;
-}
-
-.print-friendly .resume-style-classic #resume-content h1,
-.print-friendly .resume-style-classic #resume-content h2 {
-  color: #000000 !important;
-  border-bottom-color: #000000 !important;
-}
-
-.print-friendly .resume-style-technical #resume-content h2 {
-    color: #000000 !important;
-}
 

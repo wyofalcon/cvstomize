@@ -1,7 +1,5 @@
 import React, { useState } from 'react';
 import axios from 'axios';
-import jsPDF from 'jspdf';
-import html2canvas from 'html2canvas';
 import FileUpload from './components/FileUpload';
 import TextInput from './components/TextInput';
 import ResumeDisplay from './components/ResumeDisplay';
@@ -69,67 +67,7 @@ function App() {
 
   const handleDownload = () => {
     if (!generatedCv) return;
-
-    const resumeElement = document.getElementById('resume-content');
-    if (!resumeElement) return;
-
-    // Temporarily add a class to the body for print-friendly styles
-    document.body.classList.add('print-friendly');
-
-    const padding = 20;
-
-    html2canvas(resumeElement, {
-      scale: 2,
-      useCORS: true,
-      logging: true,
-      x: padding,
-      y: padding,
-      width: resumeElement.offsetWidth - padding * 2,
-      height: resumeElement.offsetHeight - padding,
-    }).then(canvas => {
-      const imgData = canvas.toDataURL('image/png');
-      const pdf = new jsPDF({
-        orientation: 'p',
-        unit: 'pt',
-        format: 'a4',
-      });
-
-      const pdfWidth = pdf.internal.pageSize.getWidth() - padding * 2;
-      const pdfHeight = pdf.internal.pageSize.getHeight() - padding * 2;
-      const canvasWidth = canvas.width;
-      const canvasHeight = canvas.height;
-      const ratio = canvasWidth / canvasHeight;
-      const width = pdfWidth;
-      let height = width / ratio;
-
-      pdf.rect(padding, padding, pdfWidth, pdfHeight);
-
-      let position = padding;
-
-      if (height > pdfHeight) {
-        let page = 1;
-        while (height > 0) {
-          const pageHeight = Math.min(height, pdfHeight);
-          pdf.addImage(imgData, 'PNG', padding, position, width, pageHeight, undefined, 'FAST');
-          height -= pageHeight;
-          if (height > 0) {
-            pdf.addPage();
-            pdf.rect(padding, padding, pdfWidth, pdfHeight);
-            position = padding - pdfHeight * (page - 1);
-          }
-          page++;
-        }
-      } else {
-        pdf.addImage(imgData, 'PNG', padding, padding, width, height);
-      }
-
-      pdf.save('CVstomize_Resume.pdf');
-      document.body.classList.remove('print-friendly'); // Clean up the class
-    }).catch(err => {
-      console.error("Error creating PDF: ", err);
-      setError("Could not generate PDF. Please try a different style or contact support.");
-      document.body.classList.remove('print-friendly'); // Also clean up on error
-    });
+    window.print();
   };
 
   return (

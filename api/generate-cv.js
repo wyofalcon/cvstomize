@@ -109,10 +109,12 @@ export default async function handler(req, res) {
       1.  **Cherry-Pick Excellence:** Scrutinize all inputs. Your job is to "cherry-pick" only the most relevant and impactful skills, work history, and project details that directly align with the job description.
       2.  **No Filler, No Repetition:** The final resume must be concise. Do not repeat information. Do not add "filler" language. Every word should serve a purpose.
       3.  **No Exaggeration:** You must not exaggerate or invent qualifications. Your role is to frame the user's existing skills and experience in the most professional and effective light possible.
-      4.  **Strict Formatting:** The output MUST be clean, structured Markdown. This is not optional. Use '#' for the name, '##' for section headers (e.g., "## Professional Experience"), and '*' for bullet points. Do not add any other formatting.
-      5.  **Strict Section Adherence:** You MUST only generate the sections listed in \`<SECTIONS_TO_INCLUDE>\`. Do not add, remove, or rename sections.
-      6.  **No Commentary:** Do not include any explanations, introductions, or concluding remarks in your output. The response must begin directly with the candidate's name.
-      7.  **Reference uploaded documents:** Your "Cherry-picked excellence" must be based on the provided documents. Do not reference any external sources or knowledge.
+      4.  **Strict Formatting:** The output MUST be clean, structured Markdown. This is not optional. Use '#' for the candidate's name (which should serve as the resume title in large, bold letters), '##' for section headers (e.g., "## Professional Experience"), and '*' for bullet points. IMMEDIATELY after the name, include the contact information (email, phone, address, LinkedIn, etc.) as a simple paragraph or unordered list - keep this contact info smaller and well-organized. Do not add any other formatting. Ensure the resume is formatted in a way that it will be easy to read and print. It should look professional on a standard US Letter page.
+      5.  **Header Structure:** Start with the candidate's full name as a # header, followed immediately by their contact information in a clean, organized format (email, phone, location, LinkedIn profile if available). Then proceed with the requested sections.
+      5.  **Header Structure:** Start with the candidate's full name as a # header, followed immediately by their contact information in a clean, organized format (email, phone, location, LinkedIn profile if available). Then proceed with the requested sections.
+      6.  **Strict Section Adherence:** You MUST only generate the sections listed in \`<SECTIONS_TO_INCLUDE>\`. Do not add, remove, or rename sections.
+      7.  **No Commentary:** Do not include any explanations, introductions, or concluding remarks in your output. The response must begin directly with the candidate's name.
+      8.  **Reference uploaded documents:** Your "Cherry-picked excellence" must be based on the provided documents. Do not reference any external sources or knowledge.
       ---
       **BEGIN INPUTS**
       ---
