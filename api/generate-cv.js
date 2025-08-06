@@ -65,6 +65,23 @@ const extractTextFromFile = async (filePath) => {
     }
 };
 
+const generateWithRetry = async (model, prompt, maxRetries = 3) => {
+  for (let attempt = 1; attempt <= maxRetries; attempt++) {
+    try {
+      const result = await model.generateContent(prompt);
+      return result.response.text();
+    } catch (error) {
+      if (error.status === 503 && attempt < maxRetries) {
+        const delay = Math.pow(2, attempt) * 1000; // Exponential backoff: 2s, 4s, 8s
+        console.log(`Attempt ${attempt} failed. Retrying in ${delay}ms...`);
+        await new Promise(resolve => setTimeout(resolve, delay));
+        continue;
+      }
+      throw error; // Re-throw if it's not a 503 or we've exhausted retries
+    }
+  }
+};
+
 export default async function handler(req, res) {
   if (req.method !== 'POST') {
     return res.status(405).json({ error: 'Method Not Allowed' });
@@ -132,10 +149,7 @@ export default async function handler(req, res) {
       </SECTIONS_TO_INCLUDE>
     `;
 
-    const result = await model.generateContent(prompt);
-    const response = await result.response;
-    const generatedText = response.text();
-    
+    const generatedText = await generateWithRetry(model, prompt);
     res.status(200).json({ generatedCv: generatedText });
 
   } catch (error) {
