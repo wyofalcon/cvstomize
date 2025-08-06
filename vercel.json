@@ -1,8 +1,16 @@
 {
+  "builds": [
+    {
+      "src": "package.json",
+      "use": "@vercel/static-build",
+      "config": {
+        "installCommand": "apt-get update && apt-get install -y build-essential libcairo2-dev libpango1.0-dev libjpeg-dev libgif-dev librsvg2-dev && npm install"
+      }
+    }
+  ],
   "functions": {
-    "api/generate-cv.js": {
-      "maxDuration": 30,
-      "memory": 1024
+    "api/**/*.js": {
+      "runtime": "nodejs18.x"
     }
   }
 }
