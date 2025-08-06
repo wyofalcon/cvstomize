@@ -76,6 +76,9 @@ function App() {
 
       <header className="App-header">
         <h1>Don't just apply, <span>CVstomize</span></h1>
+        <div className="banner">
+          <p>Tailor your Resume for any Job in Seconds — <strong>For Free!</strong></p>
+        </div>
         <button className="tutorial-btn" onClick={() => setIsTutorialOpen(true)}>
           How to Use
         </button>
