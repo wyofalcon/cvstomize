@@ -2,7 +2,9 @@ import { GoogleGenerativeAI } from '@google/generative-ai';
 import formidable from 'formidable';
 import fs from 'fs';
 import mammoth from 'mammoth';
-import * as pdfjsLib from 'pdfjs-dist/legacy/build/pdf.js';
+import pkg from 'pdfjs-dist/legacy/build/pdf.js';
+const { getDocument } = pkg;
+pkg.GlobalWorkerOptions.workerSrc = '';
 
 export const config = {
   api: {
@@ -42,7 +44,7 @@ const extractTextFromFile = async (filePath) => {
         if (extension === 'pdf') {
             console.log('Extracting PDF:', filePath);
             const data = new Uint8Array(dataBuffer);
-            const doc = await pdfjsLib.getDocument({ data }).promise;
+            const doc = await getDocument({ data, GlobalWorkerOptions: { workerSrc: '' } }).promise;
             let text = '';
             for (let i = 1; i <= doc.numPages; i++) {
                 const page = await doc.getPage(i);
