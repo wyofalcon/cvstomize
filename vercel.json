@@ -3,7 +3,7 @@
     "api/generate-cv.js": {
       "maxDuration": 30,
       "memory": 1024,
-      "maxRequestBodySize": "50mb"
+      "maxLambdaSize": "50mb"
     }
   }
 }
