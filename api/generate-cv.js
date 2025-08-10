@@ -43,12 +43,15 @@ const extractTextFromFile = async (filePath) => {
             console.log('Extracting PDF:', filePath);
             const data = new Uint8Array(dataBuffer);
             const doc = await getDocument({ data }).promise;
+            console.log(`PDF has ${doc.numPages} pages.`);
             let text = '';
             for (let i = 1; i <= doc.numPages; i++) {
                 const page = await doc.getPage(i);
                 const content = await page.getTextContent();
                 const strings = content.items.map(item => item.str);
-                text += strings.join(' ') + '\n';
+                const pageText = strings.join(' ');
+                console.log(`Page ${i} text:`, pageText);
+                text += pageText + '\n';
             }
             return text;
         } else if (extension === 'docx') {
@@ -61,7 +64,7 @@ const extractTextFromFile = async (filePath) => {
         }
     } catch (error) {
         console.error(`Error extracting text from ${filePath}:`, error);
-        return '';
+        throw error; // Re-throw the error to be caught by the main handler
     }
 };
 
