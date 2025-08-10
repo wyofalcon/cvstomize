@@ -2,7 +2,12 @@ import { GoogleGenerativeAI } from '@google/generative-ai';
 import formidable from 'formidable';
 import fs from 'fs';
 import mammoth from 'mammoth';
+<<<<<<< Updated upstream
 import * as pdfjsLib from 'pdfjs-dist/legacy/build/pdf.js';
+=======
+import pkg from 'pdfjs-dist/build/pdf.js';
+const { getDocument } = pkg;
+>>>>>>> Stashed changes
 
 export const config = {
   api: {
