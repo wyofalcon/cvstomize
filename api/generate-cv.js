@@ -35,29 +35,17 @@ const extractTextFromFile = async (filePath) => {
     const extension = filePath.split('.').pop().toLowerCase();
     try {
         if (!fs.existsSync(filePath)) {
-            throw new Error(`File does not exist: ${filePath}`);
+            console.error(`File not found: ${filePath}`);
+            return '';
         }
         const dataBuffer = fs.readFileSync(filePath);
 
-        if (extension === 'pdf') {
-            console.log('Extracting PDF:', filePath);
-            const data = new Uint8Array(dataBuffer);
-            const doc = await getDocument({ data }).promise;
-            let text = '';
-            for (let i = 1; i <= doc.numPages; i++) {
-                const page = await doc.getPage(i);
-                const content = await page.getTextContent();
-                const strings = content.items.map(item => item.str);
-                text += strings.join(' ') + '\n';
-            }
-            return text;
-        } else if (extension === 'docx') {
-            console.log('Extracting DOCX:', filePath);
-            const result = await mammoth.extractRawText({ buffer: dataBuffer });
-            return result.value;
+        if (extension === 'docx') {
+            const { value } = await mammoth.extractRawText({ buffer: dataBuffer });
+            return value;
         } else {
-            console.log('Extracting as plain text:', filePath);
-            return dataBuffer.toString('utf-8');
+            // Fallback for other text-based files like .txt
+            return dataBuffer.toString('utf8');
         }
     } catch (error) {
         console.error(`Error extracting text from ${filePath}:`, error);
