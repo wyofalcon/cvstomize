@@ -1,4 +1,4 @@
-# CVstomize: AI-Powered Resume Tailoring
+# CVstomize: AI-Powered Resume Tailoring. ATS pwnage
 
 ## 1. Project Purpose
 
