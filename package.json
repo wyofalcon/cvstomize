@@ -4,16 +4,17 @@
   "private": true,
   "dependencies": {
     "@google/generative-ai": "^0.14.1",
+    "@napi-rs/canvas": "^0.1.44",
     "@testing-library/jest-dom": "^5.17.0",
     "@testing-library/react": "^13.4.0",
     "@testing-library/user-event": "^13.5.0",
     "axios": "^1.7.2",
-    "@napi-rs/canvas": "^0.1.44",
     "docx": "^8.5.0",
     "formidable": "^3.5.1",
     "html2canvas": "^1.4.1",
     "jspdf": "^2.5.1",
     "mammoth": "^1.10.0",
+    "pdf-parse": "^1.1.1",
     "pdfjs-dist": "^3.11.174",
     "puppeteer": "^24.15.0",
     "react": "^18.3.1",
@@ -24,11 +25,11 @@
     "web-vitals": "^2.1.4"
   },
   "scripts": {
-"start": "react-scripts start",
-"build": "react-scripts build",
-"test": "react-scripts test",
-"eject": "react-scripts eject"
-},
+    "start": "react-scripts start",
+    "build": "react-scripts build",
+    "test": "react-scripts test",
+    "eject": "react-scripts eject"
+  },
   "eslintConfig": {
     "extends": [
       "react-app",
